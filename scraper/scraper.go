@@ -9,7 +9,6 @@ import (
 )
 
 // Returns the Quizlet study set from a given URL in the form of two slices.
-// This will return empty slices if the URL is not a Quizlet URL.
 
 func GetStudySet(url string) ([]string, []string, error) {
 	termArr := make([]string, 0)
@@ -24,17 +23,10 @@ func GetStudySet(url string) ([]string, []string, error) {
 	// Avoid the CAPTCHA
 	req.Header.Set("User-Agent", "Mozilla/5.0 (Android 4.4; Mobile; rv:41.0) Gecko/41.0 Firefox/41.0")
 
+	// Do the request
 	resp, err := client.Do(req)
 	if err != nil {
-		returnString := err.Error()
-		if strings.Contains(err.Error(), "unsupported protocol scheme") {
-			returnString = "Not a valid URL. Is there a 'https://' at the beginning?"
-		} else if strings.Contains(err.Error(), "connection refused") {
-			returnString = "Connection refused. Are you connected to the network?"
-		} else if strings.Contains(err.Error(), "no such host") {
-			returnString = "Not a valid URL. Did you type in the address correctly?"
-		}
-		funcErr := errors.New(returnString)
+		funcErr := errors.New(reqErr(err))
 		return nil, nil, funcErr
 	}
 
@@ -44,6 +36,7 @@ func GetStudySet(url string) ([]string, []string, error) {
 	}
 	defer resp.Body.Close()
 
+	// Search for terms in body of website
 	r, _ := regexp.Compile("<\\s*span class=\"TermText[^>]*>(?P<Text>(.*?))<\\s*/\\s*span>")
 	for i, text := range r.FindAllStringSubmatch(string(body), -1) {
 		text[1] = strings.ReplaceAll(text[1], "<br>", "\r")
@@ -59,4 +52,17 @@ func GetStudySet(url string) ([]string, []string, error) {
 		err = errors.New("Not a valid Quizlet study set URL")
 	}
 	return termArr, defArr, err
+}
+
+// Handle errors from the HTTP request
+func reqErr(err error) (string) {
+	returnString := err.Error()
+	if strings.Contains(err.Error(), "unsupported protocol scheme") {
+		returnString = "Not a valid URL. Is there a 'https://' at the beginning?"
+	} else if strings.Contains(err.Error(), "connection refused") {
+		returnString = "Connection refused. Are you connected to the network?"
+	} else if strings.Contains(err.Error(), "no such host") {
+		returnString = "Not a valid URL. Did you type in the address correctly?"
+	}
+	return returnString
 }
