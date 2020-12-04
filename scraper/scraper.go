@@ -46,6 +46,7 @@ func GetStudySet(url string) ([]string, []string, error) {
 
 	r, _ := regexp.Compile("<\\s*span class=\"TermText[^>]*>(?P<Text>(.*?))<\\s*/\\s*span>")
 	for i, text := range r.FindAllStringSubmatch(string(body), -1) {
+		text[1] = strings.ReplaceAll(text[1], "<br>", "\r")
 		if i % 2 == 0 {
 			termArr = append(termArr, text[1])
 		} else {
