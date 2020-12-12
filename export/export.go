@@ -1,24 +1,24 @@
 package export
 
 import (
-	"os"
 	"encoding/csv"
+	"os"
 )
 
-func CreateSheet(terms []string, definitions []string, filetype string) {
+func CreateSheet(terms []string, definitions []string, filetype string, name string) {
 	switch filetype {
 	case "csv":
-		createCsvTsv(terms, definitions, "csv")
-		break;
+		createCsvTsv(terms, definitions, "csv", name)
+		break
 	case "tsv":
-		createCsvTsv(terms, definitions, "tsv")
-		break;
+		createCsvTsv(terms, definitions, "tsv", name)
+		break
 	}
-	
+
 }
 
-func createCsvTsv(terms []string, definitions []string, filetype string) {
-	file, err := os.Create("out." + filetype)
+func createCsvTsv(terms []string, definitions []string, filetype string, name string) {
+	file, err := os.Create(name + "." + filetype)
 	if err != nil {
 		panic(err)
 	}
