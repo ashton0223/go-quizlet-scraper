@@ -1,10 +1,10 @@
 package scraper
 
 import (
-	"net/http"
-	"io/ioutil"
-	"regexp"
 	"errors"
+	"io/ioutil"
+	"net/http"
+	"regexp"
 	"strings"
 )
 
@@ -15,9 +15,9 @@ func GetStudySet(url string) ([]string, []string, error) {
 	defArr := make([]string, 0)
 
 	client := &http.Client{}
-	req, err := http.NewRequest("GET",url, nil)
+	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
-		panic(err)
+		return nil, nil, err
 	}
 
 	// Avoid the CAPTCHA
@@ -32,7 +32,7 @@ func GetStudySet(url string) ([]string, []string, error) {
 
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		panic(err)
+		return nil, nil, err
 	}
 	defer resp.Body.Close()
 
@@ -40,7 +40,7 @@ func GetStudySet(url string) ([]string, []string, error) {
 	r, _ := regexp.Compile("<\\s*span class=\"TermText[^>]*>(?P<Text>(.*?))<\\s*/\\s*span>")
 	for i, text := range r.FindAllStringSubmatch(string(body), -1) {
 		text[1] = strings.ReplaceAll(text[1], "<br>", "\r")
-		if i % 2 == 0 {
+		if i%2 == 0 {
 			termArr = append(termArr, text[1])
 		} else {
 			defArr = append(defArr, text[1])
@@ -55,7 +55,7 @@ func GetStudySet(url string) ([]string, []string, error) {
 }
 
 // Handle errors from the HTTP request
-func reqErr(err error) (string) {
+func reqErr(err error) string {
 	returnString := err.Error()
 	if strings.Contains(err.Error(), "unsupported protocol scheme") {
 		returnString = "Not a valid URL. Is there a 'https://' at the beginning?"
