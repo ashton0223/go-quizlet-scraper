@@ -10,6 +10,12 @@ import (
 	"github.com/ashton0223/go-quizlet-scraper/scraper"
 )
 
+// Errors are in red, success in green
+var (
+	red   = "\033[1;31m%s\033[0m"
+	green = "\033[1;32m%s\033[0m"
+)
+
 func main() {
 	var url string
 	var filetype string
@@ -47,11 +53,17 @@ func main() {
 
 	termArr, defArr, err := scraper.GetStudySet(url)
 	if err != nil {
-		fmt.Println(err)
+		fmt.Println(fmt.Sprintf(red, err))
 		os.Exit(1)
 	}
 
-	export.CreateSheet(termArr, defArr, filetype, name)
+	err = export.CreateSheet(termArr, defArr, filetype, name)
+	if err != nil {
+		fmt.Println(fmt.Sprintf(red, err))
+		os.Exit(1)
+	} else {
+		fmt.Println(fmt.Sprintf(green, "Successfully created spreadsheet"))
+	}
 }
 
 func getInput(message string) string {
