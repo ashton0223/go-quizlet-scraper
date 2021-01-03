@@ -1,0 +1,6 @@
+/old
+*/target
+*/*/target
+*.a
+*.h
+/gui/scraper-sys/src/bindings.rs
