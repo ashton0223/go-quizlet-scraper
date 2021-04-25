@@ -71,7 +71,13 @@ func getInput(message string) string {
 	fmt.Println(message)
 	fmt.Print("--> ")
 	input, _ := reader.ReadString('\n')
+
+	// Linux needs this
 	input = strings.ReplaceAll(input, "\n", "")
+
+	// Windows needs this
+	input = strings.ReplaceAll(input, "\r", "")
+
 	return input
 }
 
